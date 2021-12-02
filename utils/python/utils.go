@@ -25,8 +25,13 @@ func runPythonCommand(execPath string, cmdArgs []string, envs string) (data []by
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Failed running command: '%s %s %s' with error: %s - %s", envs, execPath, strings.Join(cmdArgs, " "), err.Error(), stderr.String()))
 	}
-
-	return stdout.Bytes(), cmd.Process.Kill()
+	data = stdout.Bytes()
+	if cmd.ProcessState.Exited() == false {
+		err = cmd.Process.Kill()
+	} else {
+		fmt.Println("@@@Exited@@@")
+	}
+	return
 }
 
 // Parse pythonDependencyPackage list to dependencies map (mapping dependency to his child deps)
