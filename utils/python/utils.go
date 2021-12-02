@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/jfrog/jfrog-client-go/utils/errorutils"
-	"github.com/jfrog/jfrog-client-go/utils/log"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/jfrog/jfrog-client-go/utils/errorutils"
+	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
 func runPythonCommand(execPath string, cmdArgs []string, envs string) (data []byte, err error) {
@@ -24,7 +25,8 @@ func runPythonCommand(execPath string, cmdArgs []string, envs string) (data []by
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Failed running command: '%s %s %s' with error: %s - %s", envs, execPath, strings.Join(cmdArgs, " "), err.Error(), stderr.String()))
 	}
-	return stdout.Bytes(), nil
+
+	return stdout.Bytes(), cmd.Process.Kill()
 }
 
 // Parse pythonDependencyPackage list to dependencies map (mapping dependency to his child deps)
