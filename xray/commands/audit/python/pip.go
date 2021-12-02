@@ -1,12 +1,14 @@
 package python
 
 import (
+	"fmt"
+	"os"
+
 	piputils "github.com/jfrog/jfrog-cli-core/v2/utils/python"
 	"github.com/jfrog/jfrog-cli-core/v2/xray/commands/audit"
 	"github.com/jfrog/jfrog-client-go/utils/io/fileutils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/jfrog/jfrog-client-go/xray/services"
-	"os"
 )
 
 type AuditPipCommand struct {
@@ -64,6 +66,8 @@ func (apc *AuditPipCommand) getDependencies() (dependenciesGraph map[string][]st
 	}
 
 	defer func() {
+		fmt.Println("1wd:" + wd)
+		fmt.Println("2:" + tempDirPath)
 		e := os.Chdir(wd)
 		if e != nil && err == nil {
 			err = e
