@@ -20,7 +20,7 @@ func NewBuildDockerCreateCommand() *BuildDockerCreateCommand {
 // Kaniko is a tool to build & push container images from a Dockerfile, inside a container or Kubernetes cluster.
 // Tag and Sha256 will be used later on to search the image in Artifactory.
 func (bdc *BuildDockerCreateCommand) SetImageNameWithDigest(filePath string) (err error) {
-	bdc.imageTag, bdc.manifestSha256, err = container.GetImageTagWithDigest(filePath)
+	bdc.image, bdc.manifestSha256, err = container.GetImageTagWithDigest(filePath)
 	return
 }
 
@@ -29,7 +29,6 @@ func (bdc *BuildDockerCreateCommand) Run() error {
 	if err != nil {
 		return err
 	}
-	image := container.NewImage(bdc.imageTag)
 	buildName, err := bdc.buildConfiguration.GetBuildName()
 	if err != nil {
 		return err
@@ -46,7 +45,11 @@ func (bdc *BuildDockerCreateCommand) Run() error {
 	if err != nil {
 		return err
 	}
-	builder, err := container.NewRemoteAgentBuildInfoBuilder(image, bdc.Repo(), buildName, buildNumber, project, serviceManager, bdc.manifestSha256)
+	repo, err := bdc.Repo()
+	if err != nil {
+		return err
+	}
+	builder, err := container.NewRemoteAgentBuildInfoBuilder(bdc.image, repo, buildName, buildNumber, project, serviceManager, bdc.manifestSha256)
 	if err != nil {
 		return err
 	}

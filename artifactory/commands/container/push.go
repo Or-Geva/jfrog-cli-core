@@ -68,8 +68,7 @@ func (pc *PushCommand) Run() error {
 	}
 	// Perform push.
 	cm := container.NewManager(pc.containerManagerType)
-	image := container.NewImage(pc.imageTag)
-	err = cm.Push(image)
+	err = cm.Push(pc.image)
 	if err != nil {
 		return err
 	}
@@ -96,7 +95,11 @@ func (pc *PushCommand) Run() error {
 	if err != nil {
 		return err
 	}
-	builder, err := container.NewLocalAgentBuildInfoBuilder(image, pc.Repo(), buildName, buildNumber, pc.BuildConfiguration().GetProject(), serviceManager, container.Push, cm)
+	repo, err := pc.Repo()
+	if err != nil {
+		return err
+	}
+	builder, err := container.NewLocalAgentBuildInfoBuilder(pc.image, repo, buildName, buildNumber, pc.BuildConfiguration().GetProject(), serviceManager, container.Push, cm)
 	if err != nil {
 		return err
 	}

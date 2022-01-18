@@ -9,8 +9,12 @@ import (
 )
 
 type Image struct {
-	// Image name includes the registry domain, image base name and image tag e.g.: https://my-registry/docker-local/hello-world:latest.
+	// Image name includes the registry domain, image base name and image tag e.g.: my-registry/docker-local/hello-world:latest.
 	name string
+}
+
+func NewImage(imageTag string) *Image {
+	return &Image{name: imageTag}
 }
 
 // Get image name
@@ -63,4 +67,21 @@ func (image *Image) GetImageBaseName() (string, error) {
 	tagIndex := strings.LastIndex(imageName, ":")
 
 	return imageName[:tagIndex], nil
+}
+
+func (image *Image) GetImageTag() string {
+	index := strings.LastIndex(image.name, ":")
+	if index < 0  {
+		log.Debug("The image '" + image.name + "' does not include tag. Using the 'latest' tag.")
+		return "latest"
+	}
+	return image.name[index+1:]
+}
+
+func (image *Image) GetRegistry() (string, error) {
+	if err := image.validateTag(); err != nil {
+		return "", err
+	}
+	indexOfLastSlash := strings.LastIndex(image.name, "/")
+	return image.name[:indexOfLastSlash], nil
 }

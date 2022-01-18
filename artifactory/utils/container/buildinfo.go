@@ -143,30 +143,28 @@ func getManifestDependency(searchResults *utils.ResultItem) (dependency buildinf
 }
 
 // Read the file which contains the following format: 'IMAGE-TAG-IN-ARTIFACTORY'@sha256'SHA256-OF-THE-IMAGE-MANIFEST'.
-func GetImageTagWithDigest(filePath string) (tag string, sha256 string, err error) {
+func GetImageTagWithDigest(filePath string) (*Image, string, error) {
 	var buildxMetaData buildxMetaData
-	var data []byte
-	data, err = ioutil.ReadFile(filePath)
+	data, err := ioutil.ReadFile(filePath)
 	if errorutils.CheckError(err) != nil {
 		log.Debug("ioutil.ReadFile failed with '%s'\n", err)
-		return
+		return nil, "", err
 	}
 	json.Unmarshal(data, &buildxMetaData)
 	// Try to read buildx metadata file.
 	if buildxMetaData.ImageName != "" && buildxMetaData.ImageSha256 != "" {
-		return buildxMetaData.ImageName, buildxMetaData.ImageSha256, nil
+		return NewImage(buildxMetaData.ImageName), buildxMetaData.ImageSha256, nil
 	}
 	// Try read Kaniko/oc file.
 	splittedData := strings.Split(string(data), `@`)
 	if len(splittedData) != 2 {
-		err = errorutils.CheckErrorf(`unexpected file format "` + filePath + `". The file should include one line in the following format: image-tag@sha256`)
-		return
+		return nil, "", errorutils.CheckErrorf(`unexpected file format "` + filePath + `". The file should include one line in the following format: image-tag@sha256`)
 	}
-	tag, sha256 = splittedData[0], strings.Trim(splittedData[1], "\n")
+	tag, sha256 := splittedData[0], strings.Trim(splittedData[1], "\n")
 	if tag == "" || sha256 == "" {
 		err = errorutils.CheckErrorf(`missing image-tag/sha256 in file: "` + filePath + `"`)
 	}
-	return
+	return NewImage(tag), sha256, nil
 }
 
 type buildxMetaData struct {

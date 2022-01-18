@@ -34,8 +34,7 @@ func (pc *PullCommand) Run() error {
 	}
 	// Perform pull.
 	cm := container.NewManager(pc.containerManagerType)
-	image := container.NewImage(pc.imageTag)
-	err = cm.Pull(image)
+	err = cm.Pull(pc.image)
 	if err != nil {
 		return err
 	}
@@ -59,7 +58,11 @@ func (pc *PullCommand) Run() error {
 	if err != nil {
 		return err
 	}
-	builder, err := container.NewLocalAgentBuildInfoBuilder(image, pc.Repo(), buildName, buildNumber, project, serviceManager, container.Pull, cm)
+	repo, err := pc.Repo()
+	if err != nil {
+		return err
+	}
+	builder, err := container.NewLocalAgentBuildInfoBuilder(pc.image, repo, buildName, buildNumber, project, serviceManager, container.Pull, cm)
 	if err != nil {
 		return err
 	}

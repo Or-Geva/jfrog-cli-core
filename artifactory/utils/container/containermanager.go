@@ -3,11 +3,12 @@ package container
 import (
 	"bytes"
 	"fmt"
-	"github.com/jfrog/gofrog/version"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
+
+	"github.com/jfrog/gofrog/version"
 
 	"github.com/jfrog/jfrog-cli-core/v2/utils/config"
 	"github.com/jfrog/jfrog-cli-core/v2/utils/coreutils"
@@ -97,10 +98,6 @@ func (containerManager *containerManager) GetContainerManagerType() ContainerMan
 	return containerManager.Type
 }
 
-func NewImage(tag string) *Image {
-	return &Image{name: tag}
-}
-
 // Image push command
 type pushCmd struct {
 	imageTag         *Image
@@ -170,22 +167,22 @@ func (getImageSystemCompatibilityCmd *getImageSystemCompatibilityCmd) RunCmd() (
 	return buffer.String(), err
 }
 
-// Get registry from tag
-func ResolveRegistryFromTag(imageTag string) (string, error) {
-	indexOfFirstSlash := strings.Index(imageTag, "/")
-	if indexOfFirstSlash < 0 {
-		err := errorutils.CheckErrorf("Invalid image tag received for pushing to Artifactory - tag does not include a slash.")
-		return "", err
-	}
-	indexOfSecondSlash := strings.Index(imageTag[indexOfFirstSlash+1:], "/")
-	// Reverse proxy Artifactory
-	if indexOfSecondSlash < 0 {
-		return imageTag[:indexOfFirstSlash], nil
-	}
-	// Can be reverse proxy or proxy-less Artifactory
-	indexOfSecondSlash += indexOfFirstSlash + 1
-	return imageTag[:indexOfSecondSlash], nil
-}
+// // Get registry from tag
+// func ResolveRegistryFromTag(imageTag string) (string, error) {
+// 	indexOfFirstSlash := strings.Index(imageTag, "/")
+// 	if indexOfFirstSlash < 0 {
+// 		err := errorutils.CheckErrorf("Invalid image tag received for pushing to Artifactory - tag does not include a slash.")
+// 		return "", err
+// 	}
+// 	indexOfSecondSlash := strings.Index(imageTag[indexOfFirstSlash+1:], "/")
+// 	// Reverse proxy Artifactory
+// 	if indexOfSecondSlash < 0 {
+// 		return imageTag[:indexOfFirstSlash], nil
+// 	}
+// 	// Can be reverse proxy or proxy-less Artifactory
+// 	indexOfSecondSlash += indexOfFirstSlash + 1
+// 	return imageTag[:indexOfSecondSlash], nil
+// }
 
 // Login command
 type LoginCmd struct {
@@ -234,8 +231,8 @@ func (pullCmd *pullCmd) RunCmd() error {
 
 // First we'll try to login assuming a proxy-less tag (e.g. "registry-address/docker-repo/image:ver").
 // If fails, we will try assuming a reverse proxy tag (e.g. "registry-address-docker-repo/image:ver").
-func ContainerManagerLogin(imageTag string, config *ContainerManagerLoginConfig, containerManager ContainerManagerType) error {
-	imageRegistry, err := ResolveRegistryFromTag(imageTag)
+func ContainerManagerLogin(image *Image, config *ContainerManagerLoginConfig, containerManager ContainerManagerType) error {
+	imageRegistry, err := image.GetRegistry()
 	if err != nil {
 		return err
 	}

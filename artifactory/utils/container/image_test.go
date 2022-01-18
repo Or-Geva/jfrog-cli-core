@@ -73,7 +73,7 @@ func TestResolveRegistryFromTag(t *testing.T) {
 	}
 
 	for _, v := range imageTags {
-		result, err := ResolveRegistryFromTag(v.in)
+		result, err := NewImage(v.in).GetRegistry()
 		if err != nil && !v.expectingError {
 			t.Error(err.Error())
 		}
