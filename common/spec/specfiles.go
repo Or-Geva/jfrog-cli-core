@@ -71,6 +71,7 @@ type File struct {
 	Transitive              string
 	TargetPathInArchive     string
 	include                 []string
+	AntExcludeContentOnly   string
 }
 
 func (f File) GetInclude() []string {
@@ -123,6 +124,10 @@ func (f File) IsSymlinks(defaultValue bool) (bool, error) {
 
 func (f File) IsTransitive(defaultValue bool) (bool, error) {
 	return clientutils.StringToBool(f.Transitive, defaultValue)
+}
+
+func (f File) IsAntExcludeContentOnly(defaultValue bool) (bool, error) {
+	return clientutils.StringToBool(f.AntExcludeContentOnly, defaultValue)
 }
 
 func (f File) GetPatternType() (patternType clientutils.PatternType) {

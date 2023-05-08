@@ -247,6 +247,11 @@ func getUploadParams(f *spec.File, configuration *utils.UploadConfiguration, bui
 		return
 	}
 
+	uploadParams.AntExcludeContentOnly, err = f.IsAntExcludeContentOnly(false)
+	if err != nil {
+		return
+	}
+
 	uploadParams.ExplodeArchive, err = f.IsExplode(false)
 	if err != nil {
 		return

@@ -35,6 +35,7 @@ type builder struct {
 	transitive              bool
 	targetPathInArchive     string
 	include                 []string
+	antExcludeContentOnly   bool
 }
 
 func NewBuilder() *builder {
@@ -156,6 +157,11 @@ func (b *builder) Flat(flat bool) *builder {
 	return b
 }
 
+func (b *builder) AntExcludeContentOnly(antExcludeContentOnly bool) *builder {
+	b.antExcludeContentOnly = antExcludeContentOnly
+	return b
+}
+
 func (b *builder) Regexp(regexp bool) *builder {
 	b.regexp = regexp
 	return b
@@ -225,6 +231,7 @@ func (b *builder) BuildSpec() *SpecFiles {
 				Symlinks:                strconv.FormatBool(b.symlinks),
 				Transitive:              strconv.FormatBool(b.transitive),
 				include:                 b.include,
+				AntExcludeContentOnly:   strconv.FormatBool(b.antExcludeContentOnly),
 			},
 		},
 	}
